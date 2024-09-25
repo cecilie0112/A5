@@ -2,11 +2,10 @@
 #include <stdlib.h> 
 #include <math.h>
 
-#define INPUTMAX 100
 #define COL 2
 #define ROW 100
 
-void readFile(char * pointFile, int(**)[COL]);
+int readFile(char * pointFile, int(**)[COL]);
 int calculateCirc(int, int, int, int, int);
 
 int main(int argc, char * * argv)
@@ -21,18 +20,25 @@ int main(int argc, char * * argv)
     // int inputFlag; 
     int (*pointArray)[COL];
     pointArray = malloc(sizeof(*pointArray) * ROW);
-    readFile(argv[1], &pointArray);
-
-    // for (int i = 0; i < 300; i++) {
-    //     for (int j = 0; j < 2; j++) {
-    //         printf("%d ", pointArray[i][j]);
-    //     }
-    //     printf("\n");
-    // }
+    int rowIndx = readFile(argv[1], &pointArray);
 
     int inputFlag, xCent, yCent, radius;
+    int col = 0;
+    int count;
     do{
+      count = 0;
       inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
+      
+      int radiusSquared = radius * radius;
+      for (int row = 0; row < rowIndx; row++) {
+        if (calculateCirc(pointArray[row][col], pointArray[row][col + 1], xCent, yCent, radiusSquared)) {
+          count++;
+        }
+      }
+      
+      if (inputFlag != EOF) {
+        printf("%d\n", count);
+      }
 
     }while (inputFlag != EOF);
 
@@ -43,11 +49,11 @@ int main(int argc, char * * argv)
 } 
 
 
-void readFile(char * pointFile, int(**pointArray)[COL]) {
+int readFile(char * pointFile, int(**pointArray)[COL]) {
   FILE * fptr = fopen(pointFile, "r");
   if (fptr == NULL) {
     printf("Unable to open file");
-    return;
+    return EXIT_FAILURE;
   }
   int currentIndx = 0;
   int currentSize = ROW;
@@ -58,7 +64,7 @@ void readFile(char * pointFile, int(**pointArray)[COL]) {
         int (*tempArray)[COL] = realloc(*pointArray, (currentIndx * 2) * sizeof(**pointArray));
         if (tempArray == NULL) {
             printf("Memory allocation failed.");
-            return;
+            return EXIT_FAILURE;
         } else {
           *pointArray = tempArray;
           currentSize = currentIndx * 2;
@@ -70,13 +76,12 @@ void readFile(char * pointFile, int(**pointArray)[COL]) {
   }
 
   fclose(fptr);
+  return (currentIndx);
 }
 
-int calculateCirc(int xPoint, int yPoint, int xCent, int yCent, int radius) {
-    if ((pow(xPoint - xCent, 2) + pow(yPoint - yCent, 2)) <= pow(radius, 2)) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
+int calculateCirc(int xPoint, int yPoint, int xCent, int yCent, int radiusSquared) {
+    int xDistance = xPoint - xCent;
+    int yDistance = yPoint - yCent; 
+
+    return ((xDistance * xDistance) + (yDistance * yDistance) <= radiusSquared);
 }
