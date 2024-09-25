@@ -1,9 +1,12 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <math.h>
-#define INPUTMAX 100
 
-void readFile(char * pointFile, int * xPoint, int * yPoint);
+#define INPUTMAX 100
+#define COL 2
+#define ROW 100
+
+void readFile(char * pointFile, int(**)[COL]);
 int calculateCirc(int, int, int, int, int);
 
 int main(int argc, char * * argv)
@@ -15,29 +18,53 @@ int main(int argc, char * * argv)
         return EXIT_FAILURE;
     }
 
-    int inputFlag; 
+    // int inputFlag; 
+    int (*pointArray)[COL];
+    pointArray = malloc(sizeof(*pointArray) * ROW);
+    readFile(argv[1], &pointArray);
 
-    do {
-      int numCircPoint = 0;
-      FILE * fptr = fopen(argv[1], "r");
+    // int xCent, yCent, radius;
+    // int inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
 
-      int xCent, yCent, radius, xPoint, yPoint;
-      inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius); 
-    //   printf("x: %d, y: %d, radius: %d\n", xCent, yCent, radius);
+    // // while (inputFlag != EOF) {
+    // //     printf("Hello");
+    // //     inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
+    // // }
 
-      while ((fscanf(fptr, "%d", &xPoint) != EOF) && fscanf(fptr, "%d", &yPoint) != EOF) {
-        // printf("x-coord: %d, y-coord: %d\n", xPoint, yPoint);
-        
-        if (calculateCirc(xPoint, yPoint, xCent, yCent, radius)) {
-          numCircPoint++;
-        }
-      }
-      printf("%d\n", numCircPoint);
-      fclose(fptr);
-    }while (inputFlag != EOF); //Checking if an EOF has been read
+    free(pointArray);
 
     return EXIT_SUCCESS;
 } 
+
+
+void readFile(char * pointFile, int(**pointArray)[COL]) {
+  FILE * fptr = fopen(pointFile, "r");
+  if (fptr == NULL) {
+    printf("Unable to open file");
+    return;
+  }
+  int currentIndx = 0;
+  int currentSize = ROW;
+  int xPoint, yPoint;
+  
+  while ((fscanf(fptr, "%d", &xPoint) != EOF) && fscanf(fptr, "%d", &yPoint) != EOF) {
+    if (currentIndx >= currentSize) {
+        int (*tempArray)[COL] = realloc(*pointArray, (currentIndx * 2) * sizeof(**pointArray));
+        if (tempArray == NULL) {
+            printf("Memory allocation failed.");
+            return;
+        } else {
+          *pointArray = tempArray;
+          currentSize = currentIndx * 2;
+        }
+    }
+    (*pointArray)[currentIndx][0] = xPoint;
+    (*pointArray)[currentIndx][1] = yPoint;
+    ++currentIndx;
+  }
+
+  fclose(fptr);
+}
 
 int calculateCirc(int xPoint, int yPoint, int xCent, int yCent, int radius) {
     if ((pow(xPoint - xCent, 2) + pow(yPoint - yCent, 2)) <= pow(radius, 2)) {
@@ -46,24 +73,4 @@ int calculateCirc(int xPoint, int yPoint, int xCent, int yCent, int radius) {
     else {
         return 0;
     }
-}
-
-void readFile(char * pointFile, int * xPoint, int * yPoint) {
-  FILE * fptr = fopen(pointFile, "r");
-  if (fptr == NULL) {
-    printf("Unable to open file");
-    return;
-  }
-  
-//   char sceneArray[INPUTMAX];
-//   char * temp;
-
-  fscanf(fptr, "%d", xPoint);
-  fscanf(fptr, "%d", yPoint);
-
-//   if (fgets(sceneArray, INPUTMAX, fptr) != NULL) {
-//     strtol(sceneArray, &temp, 10);
-//   }
-
-  fclose(fptr);
 }
