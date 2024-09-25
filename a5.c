@@ -23,13 +23,19 @@ int main(int argc, char * * argv)
     pointArray = malloc(sizeof(*pointArray) * ROW);
     readFile(argv[1], &pointArray);
 
-    // int xCent, yCent, radius;
-    // int inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
+    // for (int i = 0; i < 300; i++) {
+    //     for (int j = 0; j < 2; j++) {
+    //         printf("%d ", pointArray[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
-    // // while (inputFlag != EOF) {
-    // //     printf("Hello");
-    // //     inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
-    // // }
+    int inputFlag, xCent, yCent, radius;
+    do{
+      inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
+
+    }while (inputFlag != EOF);
+
 
     free(pointArray);
 
