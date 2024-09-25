@@ -16,7 +16,7 @@ a5: $(OBJS)
 test: a5
 
 memory: a5
-	valgrind --tool=memcheck ./a5
+	valgrind -s --leak-check=full --show-leak-kinds=all --tool=memcheck ./a5 points.txt 
 
 clean: # remove all machine generated files
 	rm -f a5 *.o output? *~
