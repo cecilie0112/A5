@@ -8,7 +8,7 @@ SRCS = a5.c
 OBJS = $(SRCS:%.c=%.o)
 
 a5: $(OBJS) 
-	$(GCC) $(TESTFALGS) $(OBJS) -o a5
+	$(GCC) $(TESTFALGS) $(OBJS) -o a5 -lm
 
 .c.o: 
 	$(GCC) $(TESTFALGS) -c $*.c 
