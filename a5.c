@@ -31,10 +31,8 @@ int main(int argc, char * * argv)
       
       int radiusSquared = radius * radius;
       for (int row = 0; row < rowIndx; row++) {
-        if ((abs(pointArray[row][col]) <= (radius + xCent)) && abs(pointArray[row][col + 1]) <= (radius + yCent)){
-          if (calculateCirc(pointArray[row][col], pointArray[row][col + 1], xCent, yCent, radiusSquared)) {
-            count++;
-          }
+        if (calculateCirc(pointArray[row][col], pointArray[row][col + 1], xCent, yCent, radiusSquared)) {
+          count++;
         }
       }
       
