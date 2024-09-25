@@ -1,12 +1,22 @@
 #include <stdio.h>  
 #include <stdlib.h> 
-#include <math.h>
 
-#define COL 2
-#define ROW 100
+typedef struct tnode
+{
+  int value[2];
+  struct tnode * left;
+  struct tnode * right;
+} TreeNode;
 
-int readFile(char * pointFile, int(**)[COL]);
-int calculateCirc(int, int, int, int, int);
+typedef struct trnode
+{
+  TreeNode * root;
+} Tree;
+
+Tree * buildTree(int, int, Tree *);
+TreeNode * builderHelp (int, int, TreeNode *);
+TreeNode * newNode(int, int);
+void delTree(TreeNode * node);
 
 int main(int argc, char * * argv)
     //argv[0]: ./a5
@@ -17,71 +27,80 @@ int main(int argc, char * * argv)
         return EXIT_FAILURE;
     }
 
-    // int inputFlag; 
-    int (*pointArray)[COL];
-    pointArray = malloc(sizeof(*pointArray) * ROW);
-    int rowIndx = readFile(argv[1], &pointArray);
+    FILE * fptr = fopen(argv[1], "r");
+        if (fptr == NULL) {
+        printf("Unable to open file");
+        return EXIT_FAILURE;
+    }
+    
+    int xPoint, yPoint;
+    Tree * binaryTree = malloc(sizeof(Tree));
+    binaryTree -> root = NULL;
 
-    int inputFlag, xCent, yCent, radius;
-    int col = 0;
-    int count;
-    do{
-      count = 0;
-      inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
+    while ((fscanf(fptr, "%d", &xPoint) != EOF) && fscanf(fptr, "%d", &yPoint) != EOF) {
+        binaryTree = buildTree(xPoint, yPoint, binaryTree);
+    }
+    fclose(fptr);
+
+    TreeNode * treeRoot = binaryTree -> root;
+    printf("%d \n", treeRoot -> right -> right -> left -> value[0]);
+
+    // int inputFlag, xCent, yCent, radius;
+    // int count;
+    // do{
+    //   count = 0;
+    //   inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
       
-      int radiusSquared = radius * radius;
-      for (int row = 0; row < rowIndx; row++) {
-        if (calculateCirc(pointArray[row][col], pointArray[row][col + 1], xCent, yCent, radiusSquared)) {
-          count++;
-        }
-      }
       
-      if (inputFlag != EOF) {
-        printf("%d\n", count);
-      }
+    //   if (inputFlag != EOF) {
+    //     printf("%d\n", count);
+    //   }
 
-    }while (inputFlag != EOF);
+    // }while (inputFlag != EOF);
 
-
-    free(pointArray);
-
+    delTree(treeRoot);
+    free(binaryTree);
     return EXIT_SUCCESS;
 } 
 
-
-int readFile(char * pointFile, int(**pointArray)[COL]) {
-  FILE * fptr = fopen(pointFile, "r");
-  if (fptr == NULL) {
-    printf("Unable to open file");
-    return EXIT_FAILURE;
-  }
-  int currentIndx = 0;
-  int currentSize = ROW;
-  int xPoint, yPoint;
-  
-  while ((fscanf(fptr, "%d", &xPoint) != EOF) && fscanf(fptr, "%d", &yPoint) != EOF) {
-    if (currentIndx >= currentSize) {
-        int (*tempArray)[COL] = realloc(*pointArray, (currentIndx * 2) * sizeof(**pointArray));
-        if (tempArray == NULL) {
-            printf("Memory allocation failed.");
-            return EXIT_FAILURE;
-        } else {
-          *pointArray = tempArray;
-          currentSize = currentIndx * 2;
-        }
+void delTree(TreeNode * node) {
+    if (node == NULL) {
+        return;
     }
-    (*pointArray)[currentIndx][0] = xPoint;
-    (*pointArray)[currentIndx][1] = yPoint;
-    ++currentIndx;
-  }
-
-  fclose(fptr);
-  return (currentIndx);
+    delTree(node -> left);
+    delTree(node -> right);
+    free(node);
 }
 
-int calculateCirc(int xPoint, int yPoint, int xCent, int yCent, int radiusSquared) {
-    int xDistance = xPoint - xCent;
-    int yDistance = yPoint - yCent; 
+Tree * buildTree(int xPoint, int yPoint, Tree * binaryTree) {
+    binaryTree -> root = builderHelp(xPoint, yPoint, binaryTree -> root);
+    return binaryTree;
+}
 
-    return ((xDistance * xDistance) + (yDistance * yDistance) <= radiusSquared);
+TreeNode * builderHelp (int xPoint, int yPoint, TreeNode * node) {
+
+    if (node == NULL) {
+      return (newNode(xPoint, yPoint));
+    }
+
+    else if (node -> value[0] >= xPoint) {
+        node -> left = builderHelp(xPoint, yPoint, node -> left);
+    }
+
+    else if (node -> value[0] < xPoint) {
+        node -> right = builderHelp(xPoint, yPoint, node -> right);;
+    }
+
+    return (node);
+}
+
+TreeNode * newNode(int xPoint, int yPoint) {
+    TreeNode * node = malloc(sizeof(TreeNode));
+
+    node -> value[0] = xPoint;
+    node -> value[1] = yPoint;
+
+    node -> left = NULL;
+    node -> right = NULL;
+    return node;
 }
