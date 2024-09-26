@@ -16,7 +16,8 @@ typedef struct trnode
 Tree * buildTree(int, int, Tree *);
 TreeNode * builderHelp (int, int, TreeNode *);
 TreeNode * newNode(int, int);
-void delTree(TreeNode * node);
+void delTree(TreeNode *);
+void findCount(TreeNode *, int, int, int, int *, int, int);
 
 int main(int argc, char * * argv)
     //argv[0]: ./a5
@@ -40,26 +41,30 @@ int main(int argc, char * * argv)
     while ((fscanf(fptr, "%d", &xPoint) != EOF) && fscanf(fptr, "%d", &yPoint) != EOF) {
         binaryTree = buildTree(xPoint, yPoint, binaryTree);
     }
-    fclose(fptr);
 
     TreeNode * treeRoot = binaryTree -> root;
-    printf("%d \n", treeRoot -> right -> right -> left -> value[0]);
 
-    // int inputFlag, xCent, yCent, radius;
-    // int count;
-    // do{
-    //   count = 0;
-    //   inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
-      
-      
-    //   if (inputFlag != EOF) {
-    //     printf("%d\n", count);
-    //   }
+    int inputFlag, xCent, yCent, radius, xMax, xMin;
+    int count;
+    do{
+      count = 0;
+      inputFlag = scanf("%d %d %d", &xCent, &yCent, &radius);
 
-    // }while (inputFlag != EOF);
+      xMax = xCent + radius;
+      xMin = xCent - radius;
+      int radiusSquared = radius * radius;
+      
+      findCount(treeRoot, xCent, yCent, radiusSquared, &count, xMax, xMin);
+
+      if (inputFlag != EOF) {
+        printf("%d\n", count);
+      }
+
+    }while (inputFlag != EOF);
 
     delTree(treeRoot);
     free(binaryTree);
+    fclose(fptr);
     return EXIT_SUCCESS;
 } 
 
@@ -70,6 +75,34 @@ void delTree(TreeNode * node) {
     delTree(node -> left);
     delTree(node -> right);
     free(node);
+}
+
+void findCount(TreeNode * node, int xCent, int yCent, int radiusSquared, int * count, int xMax, int xMin) {
+    if (node == NULL) {
+        return;
+    }
+    
+    if ((node -> value[0] >= xMin) && (node -> value[0] <= xMax)) {
+        int xDistance = node -> value[0] - xCent;
+        int yDistance = node -> value[1] - yCent;
+
+        if ((xDistance * xDistance) + (yDistance * yDistance) <= radiusSquared) {
+            (*count)++;
+        }
+
+        findCount(node -> left, xCent, yCent, radiusSquared, count, xMax, xMin);
+        findCount(node -> right, xCent, yCent, radiusSquared, count, xMax, xMin);
+    }
+
+    else if (node -> value[0] < xMin) {
+        findCount(node -> right, xCent, yCent, radiusSquared, count, xMax, xMin);
+    }
+
+    else if (node -> value[0] > xMax) {
+        findCount(node -> left, xCent, yCent, radiusSquared, count, xMax, xMin);
+    }
+    
+    return;
 }
 
 Tree * buildTree(int xPoint, int yPoint, Tree * binaryTree) {
