@@ -149,20 +149,20 @@ TreeNode * builderHelp (int xPoint, int yPoint, TreeNode * node) {
     int balanceFactor = findBalanceFactor(node); //Finding the balance factor
 
     //Left rotation 
-    if ((balanceFactor <= -2) && (xPoint > node -> right -> value[0])) {
+    if ((balanceFactor <= -2) && (xPoint >= node -> right -> value[0])) {
         return (leftRotation(node));
     }
     //Right rotation
-    if ((balanceFactor >= 2) && (xPoint < node -> left -> value[0])) {
+    if ((balanceFactor >= 2) && (xPoint <= node -> left -> value[0])) {
         return (rightRotation(node));
     }
     //First left rotation --> then right rotation
-    if ((balanceFactor >= 2) && (xPoint > node -> left -> value[0])) {
+    if ((balanceFactor >= 2) && (xPoint >= node -> left -> value[0])) {
         node -> left = leftRotation(node -> left);
         return (rightRotation(node));
     }
     //First right rotation --> then left rotation
-    if ((balanceFactor <= -2) && (xPoint < node -> right -> value[0])) {
+    if ((balanceFactor <= -2) && (xPoint <= node -> right -> value[0])) {
         node -> right = rightRotation(node -> right);
         return (leftRotation(node));
     }
