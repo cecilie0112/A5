@@ -129,19 +129,11 @@ TreeNode * builderHelp (int xPoint, int yPoint, TreeNode * node) {
       return (newNode(xPoint, yPoint));
     }
 
-    else if (node -> value[0] > xPoint) {
+    else if (node -> value[0] >= xPoint) {
         node -> left = builderHelp(xPoint, yPoint, node -> left);
     }
     else if (node -> value[0] < xPoint) {
         node -> right = builderHelp(xPoint, yPoint, node -> right);
-    }
-    else {
-        if (node -> value[1] > yPoint) {
-            node -> left = builderHelp(xPoint, yPoint, node -> left);
-        }
-        else {
-            node -> right = builderHelp(xPoint, yPoint, node -> right);
-        }
     }
 
     //Finding the max height of the left and right sub tree. Adding 1 to account for the root. 
